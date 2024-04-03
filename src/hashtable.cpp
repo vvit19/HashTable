@@ -1,9 +1,6 @@
 #include "hashtable.h"
 
-static void SendWordToHashTable (HashTable* hash_t, const char* word, size_t len);
-static bool CheckRepeat         (List* list, const char* word, size_t len);
-static inline uint32_t Ror      (uint32_t num, int shift);
-static inline uint32_t Rol      (uint32_t num, int shift);
+static int CheckRepeat (List* list, const char* word, size_t len);
 
 HashTable* HashTableCtor (size_t hash_t_size, uint32_t (*hash_function) (const char*, size_t))
 {
@@ -16,6 +13,17 @@ HashTable* HashTableCtor (size_t hash_t_size, uint32_t (*hash_function) (const c
         ListCtor (&hash_t->content[i], MIN_CAPACITY);
 
     return hash_t;
+}
+
+bool FindWord (HashTable* hash_t, const char* word, size_t len)
+{
+    assert (hash_t);
+    assert (word);
+
+    uint32_t hash_value = hash_t->hash_function (word, len);
+    List* cur_list = &hash_t->content[hash_value];
+
+    return (bool) CheckRepeat (cur_list, word, len);
 }
 
 void HashTableDtor (HashTable* hash_t)
@@ -48,28 +56,29 @@ void FillHashTable (HashTable* hash_t, const char* filename)
     while (*buffer != '\0' && sscanf (buffer, "%s", word) != 0)
     {
         len = strlen (word);
-        SendWordToHashTable (hash_t, word, len);
+        InsertValue (hash_t, word, len);
         buffer += len + 1;
     }
 
     free (buffer_ptr);
 }
 
-static void SendWordToHashTable (HashTable* hash_t, const char* word, size_t len)
+void InsertValue (HashTable* hash_t, const char* word, size_t len)
 {
+    assert (hash_t);
     assert (word);
 
     uint32_t hash_value = hash_t->hash_function (word, len);
-    List* hash_list = &hash_t->content[hash_value];
-    if (CheckRepeat (hash_list, word, len)) return;
+    List* cur_list = &hash_t->content[hash_value];
+    if (CheckRepeat (cur_list, word, len)) return;
 
     char* word_ptr = (char*) calloc (1, len + 1);
     strncpy (word_ptr, word, len);
 
-    InsertTail (&hash_t->content[hash_value], word_ptr);
+    InsertTail (cur_list, word_ptr);
 }
 
-static bool CheckRepeat (List* list, const char* word, size_t len)
+static int CheckRepeat (List* list, const char* word, size_t len)
 {
     assert (list);
     assert (word);
@@ -80,98 +89,21 @@ static bool CheckRepeat (List* list, const char* word, size_t len)
     while (cur_node_index != 0)
     {
         Node cur_node = nodes_array[cur_node_index];
-        if (strncmp (word, cur_node.value, len) == 0) return true;
+        if (strncmp (word, cur_node.value, len) == 0) return cur_node_index;
         cur_node_index = cur_node.next;
     }
 
-    return false;
-}
-
-uint32_t HashZero (const char* /*word*/, size_t /*len*/)
-{
     return 0;
 }
 
-uint32_t HashFirstLetter (const char* word, size_t /*len*/)
-{
-    assert (word);
-
-    return word[0];
-}
-
-uint32_t HashStrlen (const char* /*word*/, size_t len)
-{
-    return (uint32_t) len;
-}
-
-uint32_t HashAsciiSum (const char* word, size_t len)
-{
-    assert (word);
-
-    uint32_t sum = 0;
-    for (size_t i = 0; i < len; i++) sum += word[i];
-
-    return sum;
-}
-
-uint32_t HashAsciiSumDivStrlen (const char* word, size_t len)
-{
-    assert (word);
-
-    uint32_t sum = HashAsciiSum (word, len);
-
-    return sum / (uint32_t) len;
-}
-
-uint32_t HashRor (const char* word, size_t len)
-{
-    assert (word);
-
-    uint32_t hash_value = 0;
-    for (size_t i = 0; i < len; i++) hash_value = Ror (hash_value, 1) ^ word[i];
-
-    return hash_value % HASH_T_INITIAL_SIZE;
-}
-
-uint32_t HashRol (const char* word, size_t len)
-{
-    assert (word);
-
-    uint32_t hash_value = 0;
-    for (size_t i = 0; i < len; i++) hash_value = Rol (hash_value, 1) ^ word[i];
-
-    return hash_value % HASH_T_INITIAL_SIZE;
-}
-
-static inline uint32_t Ror (uint32_t num, int shift)
-{
-    return (num >> shift) | (num << (32 - shift));
-}
-
-static inline uint32_t Rol (uint32_t num, int shift)
-{
-    return (num << shift) | (num >> (32 - shift));
-}
-
-void DumpTable (HashTable* hash_t, const char* dump_filename)
+void DeleteValue (HashTable* hash_t, const char* word, size_t len)
 {
     assert (hash_t);
-    assert (dump_filename);
+    assert (word);
 
-    FILE* dump_file = fopen (dump_filename, "w");
+    uint32_t hash_value = hash_t->hash_function (word, len);
+    List* cur_list = &hash_t->content[hash_value];
 
-    for (size_t hash = 0; hash < hash_t->size; hash++)
-    {
-        fprintf (dump_file, "HASH = %lu: \n", hash);
-
-        List cur_list = hash_t->content[hash];
-        int cur_list_index = cur_list.head;
-        while (cur_list_index != 0)
-        {
-            fprintf (dump_file, "%s \n", cur_list.nodes[cur_list_index].value);
-            cur_list_index = cur_list.nodes[cur_list_index].next;
-        }
-
-        fprintf (dump_file, "------------------------------- \n");
-    }
+    int position = CheckRepeat (cur_list, word, len);
+    if (position) ListDelete (cur_list, position);
 }

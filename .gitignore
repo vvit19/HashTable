@@ -3,3 +3,5 @@ obj
 main
 dump.txt
 .vscode
+.cache
+compile_commands.json

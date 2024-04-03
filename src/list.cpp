@@ -66,7 +66,7 @@ ListErrors InsertHead (List* list, elem_t value)
 
     list->size++;
 
-    return NO_ERROR;
+    return NO_LIST_ERROR;
 }
 
 ListErrors InsertTail (List* list, elem_t value)
@@ -92,7 +92,7 @@ ListErrors InsertTail (List* list, elem_t value)
 
     list->size++;
 
-    return NO_ERROR;
+    return NO_LIST_ERROR;
 }
 
 ListErrors InsertAfter (List* list, elem_t value, int position)
@@ -125,7 +125,7 @@ ListErrors InsertAfter (List* list, elem_t value, int position)
 
     list->linear = false;
 
-    return NO_ERROR;
+    return NO_LIST_ERROR;
 }
 
 ListErrors InsertBefore (List* list, elem_t value, int position)
@@ -164,6 +164,7 @@ ListErrors ListDelete (List* list, int position)
         return INVALID_POSITION_FOR_DELETE;
     }
 
+    free ((void*) list->nodes[position].value);
     list->nodes[position].value = POIZON;
 
     if (position == list->head)
@@ -200,7 +201,7 @@ ListErrors ListDelete (List* list, int position)
 
     list->size--;
 
-    return NO_ERROR;
+    return NO_LIST_ERROR;
 }
 
 ListErrors ListResize (List* list, int new_capacity)
@@ -220,7 +221,7 @@ ListErrors ListResize (List* list, int new_capacity)
 
     ListLinearise (list);
 
-    return NO_ERROR;
+    return NO_LIST_ERROR;
 }
 
 void ListLinearise (List* list)
@@ -278,7 +279,7 @@ static ListErrors VerifyFullList (List* list)
 
     if (list->free == 0) ListResize (list, list->capacity * 2);
 
-    return NO_ERROR;
+    return NO_LIST_ERROR;
 }
 
 static void RecFreeNodes (List* list, int cur_index)

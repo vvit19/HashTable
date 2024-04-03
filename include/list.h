@@ -10,7 +10,7 @@ typedef const char* elem_t;
 
 enum ListErrors
 {
-    NO_ERROR,
+    NO_LIST_ERROR,
     LIST_IS_FULL,
     POS_BIGGER_THAN_CAPACITY,
     INVALID_NEW_CAPACITY,
