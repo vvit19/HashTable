@@ -1,6 +1,4 @@
 #include "hashtable.h"
-#include <cstddef>
-#include <system_error>
 
 void DumpHashCsv (HashTable* hash_t, const char* dump_filename)
 {
