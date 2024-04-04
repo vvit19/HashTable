@@ -114,7 +114,7 @@ static inline uint32_t Ror (uint32_t num, int shift)
 
 <details>
 
-<summary>ROR hash implementation</summary>
+<summary>Crc32 hash implementation</summary>
 
 ~~~ C++
 uint32_t HashCRC32 (const char* word, size_t len)
@@ -155,7 +155,6 @@ uint32_t HashCRC32 (const char* word, size_t len)
 ### Вывод
 
 Идеальным показателем load factor является:
-
 load factor $=$ Число ключей $/$ Размер хеш-таблицы $= 4407 / 2003 = 2,20 $
 
-Благодаря Crc32 Hash получен наиболее близкий к этому значению результат, а также минимальная дисперсия. При рассмотрении вопросов оптимизации будем использовать именно эту хеш-функцию.
+Благодаря Crc32 Hash получен наиболее близкий к этому значению результат (load factor = 2,69), а также минимальная дисперсия (dispersion = 2,50). При рассмотрении вопросов оптимизации будем использовать именно эту хеш-функцию.
