@@ -1,6 +1,6 @@
 #include "hashtable.h"
 
-static int CheckRepeat (List* list, const char* word, size_t len);
+static int CheckRepeat (List* list, const char* word);
 
 HashTable* HashTableCtor (size_t hash_t_size, uint32_t (*hash_function) (const char*, size_t))
 {
@@ -23,7 +23,7 @@ bool FindWord (HashTable* hash_t, const char* word, size_t len)
     uint32_t hash_value = hash_t->hash_function (word, len);
     List* cur_list = &hash_t->content[hash_value];
 
-    return (bool) CheckRepeat (cur_list, word, len);
+    return (bool) CheckRepeat (cur_list, word);
 }
 
 void HashTableDtor (HashTable* hash_t)
@@ -70,7 +70,7 @@ void InsertValue (HashTable* hash_t, const char* word, size_t len)
 
     uint32_t hash_value = hash_t->hash_function (word, len);
     List* cur_list = &hash_t->content[hash_value];
-    if (CheckRepeat (cur_list, word, len)) return;
+    if (CheckRepeat (cur_list, word)) return;
 
     char* word_ptr = (char*) calloc (1, len + 1);
     strncpy (word_ptr, word, len);
@@ -78,7 +78,7 @@ void InsertValue (HashTable* hash_t, const char* word, size_t len)
     InsertTail (cur_list, word_ptr);
 }
 
-static int CheckRepeat (List* list, const char* word, size_t len)
+static int CheckRepeat (List* list, const char* word)
 {
     assert (list);
     assert (word);
@@ -89,7 +89,7 @@ static int CheckRepeat (List* list, const char* word, size_t len)
     while (cur_node_index != 0)
     {
         Node cur_node = nodes_array[cur_node_index];
-        if (strncmp (word, cur_node.value, len) == 0) return cur_node_index;
+        if (strcmp (word, cur_node.value) == 0) return cur_node_index;
         cur_node_index = cur_node.next;
     }
 
@@ -104,6 +104,6 @@ void DeleteValue (HashTable* hash_t, const char* word, size_t len)
     uint32_t hash_value = hash_t->hash_function (word, len);
     List* cur_list = &hash_t->content[hash_value];
 
-    int position = CheckRepeat (cur_list, word, len);
+    int position = CheckRepeat (cur_list, word);
     if (position) ListDelete (cur_list, position);
 }

@@ -12,7 +12,7 @@ char* GetFileContent(const char* filename)
     assert(buffer);
 
     buffer[file_size] = '\0';
-    fread(buffer, sizeof(char), file_size, file);
+    size_t size = fread(buffer, sizeof(char), file_size, file);
 
     fclose(file);
 
