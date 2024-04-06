@@ -1,5 +1,8 @@
 #include "hashtable.h"
 #include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <immintrin.h>
 #include <sys/types.h>
 
 static inline uint32_t Ror (uint32_t num, int shift);
@@ -65,24 +68,59 @@ uint32_t HashCRC32 (const char* word, size_t len)
 {
     assert (word);
 
-	uint32_t crc_table[256] = {}, crc = 0;
+	uint32_t crc_array[256] = {}, crc = 0;
 
 	for (uint32_t i = 0; i < 256; ++i)
 	{
 		crc = i;
 		for (size_t cnt = 0; cnt < 8; cnt++)
+        {
 			crc = crc & 1 ? (crc >> 1) ^ 0xEDB88320UL : crc >> 1;
+        }
 
-		crc_table[i] = crc;
+		crc_array[i] = crc;
 	};
+
 	crc = 0xFFFFFFFFUL;
 
-    for (size_t i = 0; len > 0; --len, ++i)
+    for (size_t i = 0; i < len; ++i)
     {
-        crc = crc_table[(crc ^ (uint32_t) word[i]) & 0xFF] ^ (crc >> 8);
+        crc = crc_array[(crc ^ (uint32_t) word[i]) & 0xFF] ^ (crc >> 8);
     }
 
 	return (crc ^ 0xFFFFFFFFUL) % HASH_T_SIZE;
+}
+
+uint32_t IntrinsicHashCrc32 (const char* word, size_t len)
+{
+    __m256i crc_vector_table[32] = {}, one_vecor = _mm256_set1_epi32 (1);
+    __m256i polinom_vector = _mm256_set1_epi32 (0xEDB88320UL);
+    __m256i zero_vector = _mm256_set1_epi32 (0);
+
+    int bit = 0;
+    for (size_t i = 0; i < 32; ++i, bit += 8)
+    {
+        __m256i crc_vector = _mm256_set_epi32 (bit + 7, bit + 6, bit + 5, bit + 4, bit + 3, bit + 2, bit + 1, bit);
+
+        for (size_t cnt = 0; cnt < 8; cnt++)
+        {
+            __m256i and_vector = _mm256_and_si256 (crc_vector, one_vecor);
+            crc_vector = _mm256_srli_epi32 (crc_vector, 1);
+            and_vector = _mm256_mullo_epi32 (and_vector, polinom_vector);
+            crc_vector = _mm256_xor_si256 (crc_vector, and_vector);
+        }
+
+        crc_vector_table[i] = _mm256_loadu_si256 (&crc_vector);
+    }
+
+    uint32_t crc = 0xFFFFFFFFUL;
+    uint32_t* crc_array = (uint32_t*) &crc_vector_table;
+
+    for (size_t i = 0; i < len; ++i)
+        crc = crc_array[(crc ^ (uint32_t) word[i]) & 0xFF] ^ (crc >> 8);
+
+
+    return (crc ^ 0xFFFFFFFFUL) % HASH_T_SIZE;
 }
 
 static inline uint32_t Ror (uint32_t num, int shift)

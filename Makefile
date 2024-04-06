@@ -1,4 +1,4 @@
-CFLAGS = -g -O3 -fno-omit-frame-pointer
+CFLAGS = -g -O0
 
 СXX = g++
 TARGET = main

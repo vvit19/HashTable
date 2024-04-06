@@ -34,6 +34,8 @@ int main ()
         size_t finded_words = RunUnitTests (hash_t, UNIT_TESTS_FILE);
         printf ("FINDED_WORDS = %lu \n", finded_words);
 
+        HashTableDtor (hash_t);
+
     #endif
 
     return 0;

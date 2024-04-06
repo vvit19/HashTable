@@ -8,6 +8,7 @@
 #include "utils.h"
 
 #include <cstdint>
+#include <x86intrin.h>
 
 const char* const CONTENT_FILE        = "hamlet.txt";
 const char* const TXT_DUMP_FILE       = "dump.txt";
@@ -38,6 +39,7 @@ uint32_t HashAsciiSumDivStrlen (const char* word, size_t len);
 uint32_t HashRor               (const char* word, size_t len);
 uint32_t HashRol               (const char* word, size_t len);
 uint32_t HashCRC32             (const char* word, size_t len);
+uint32_t IntrinsicHashCrc32    (const char* word, size_t len);
 
 void DumpTableTxt        (HashTable* hash_t, const char* dump_filename);
 void DumpHashCsv         (HashTable* hash_t, const char* dump_filename);

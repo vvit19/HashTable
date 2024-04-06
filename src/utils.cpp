@@ -1,4 +1,4 @@
-#include "../include/utils.h"
+#include "utils.h"
 
 char* GetFileContent(const char* filename)
 {
@@ -12,7 +12,7 @@ char* GetFileContent(const char* filename)
     assert(buffer);
 
     buffer[file_size] = '\0';
-    size_t size = fread(buffer, sizeof(char), file_size, file);
+    size_t size = fread (buffer, sizeof(char), file_size, file);
 
     fclose(file);
 

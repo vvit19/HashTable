@@ -25,7 +25,7 @@ size_t RunUnitTests (HashTable* hash_t, const char* filename)
         char* word = text[i].string;
         size_t len = text[i].len;
 
-        for (int i = 0; i < TESTS_NUM; i++)
+        for (size_t k = 0; k < TESTS_NUM; k++)
             FindWord (hash_t, word, len);
 
         if (FindWord (hash_t, word, len))
