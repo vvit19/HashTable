@@ -5,6 +5,8 @@
 #include <immintrin.h>
 #include <sys/types.h>
 
+const uint32_t POLINOM = 0xEDB88320;
+
 static inline uint32_t Ror (uint32_t num, int shift);
 static inline uint32_t Rol (uint32_t num, int shift);
 
@@ -17,12 +19,12 @@ uint32_t HashFirstLetter (const char* word, size_t /*len*/)
 {
     assert (word);
 
-    return (uint32_t) word[0] % HASH_T_SIZE;
+    return (uint32_t) word[0];
 }
 
 uint32_t HashStrlen (const char* /*word*/, size_t len)
 {
-    return (uint32_t) len % HASH_T_SIZE;
+    return (uint32_t) len;
 }
 
 uint32_t HashAsciiSum (const char* word, size_t len)
@@ -32,7 +34,7 @@ uint32_t HashAsciiSum (const char* word, size_t len)
     uint32_t sum = 0;
     for (size_t i = 0; i < len; i++) sum += (uint32_t) word[i];
 
-    return sum % HASH_T_SIZE;
+    return sum;
 }
 
 uint32_t HashAsciiSumDivStrlen (const char* word, size_t len)
@@ -41,7 +43,7 @@ uint32_t HashAsciiSumDivStrlen (const char* word, size_t len)
 
     uint32_t sum = HashAsciiSum (word, len);
 
-    return (sum / (uint32_t) len) % HASH_T_SIZE;
+    return sum / (uint32_t) len;
 }
 
 uint32_t HashRor (const char* word, size_t len)
@@ -51,7 +53,7 @@ uint32_t HashRor (const char* word, size_t len)
     uint32_t hash_value = 0;
     for (size_t i = 0; i < len; i++) hash_value = Ror (hash_value, 1) ^ (uint32_t) word[i];
 
-    return hash_value % HASH_T_SIZE;
+    return hash_value;
 }
 
 uint32_t HashRol (const char* word, size_t len)
@@ -61,10 +63,10 @@ uint32_t HashRol (const char* word, size_t len)
     uint32_t hash_value = 0;
     for (size_t i = 0; i < len; i++) hash_value = Rol (hash_value, 1) ^ (uint32_t) word[i];
 
-    return hash_value % HASH_T_SIZE;
+    return hash_value;
 }
 
-uint32_t HashCRC32 (const char* word, size_t len)
+uint32_t HashCrc32 (const char* word, size_t len)
 {
     assert (word);
 
@@ -75,7 +77,7 @@ uint32_t HashCRC32 (const char* word, size_t len)
 		crc = i;
 		for (size_t cnt = 0; cnt < 8; cnt++)
         {
-			crc = crc & 1 ? (crc >> 1) ^ 0xEDB88320UL : crc >> 1;
+			crc = crc & 1 ? (crc >> 1) ^ POLINOM : crc >> 1;
         }
 
 		crc_array[i] = crc;
@@ -88,19 +90,20 @@ uint32_t HashCRC32 (const char* word, size_t len)
         crc = crc_array[(crc ^ (uint32_t) word[i]) & 0xFF] ^ (crc >> 8);
     }
 
-	return (crc ^ 0xFFFFFFFFUL) % HASH_T_SIZE;
+	return crc ^ 0xFFFFFFFFUL;
 }
 
 uint32_t IntrinsicHashCrc32 (const char* word, size_t len)
 {
     __m256i crc_vector_table[32] = {}, one_vecor = _mm256_set1_epi32 (1);
-    __m256i polinom_vector = _mm256_set1_epi32 (0xEDB88320UL);
+    __m256i polinom_vector = _mm256_set1_epi32 (POLINOM);
     __m256i zero_vector = _mm256_set1_epi32 (0);
 
     int bit = 0;
     for (size_t i = 0; i < 32; ++i, bit += 8)
     {
-        __m256i crc_vector = _mm256_set_epi32 (bit + 7, bit + 6, bit + 5, bit + 4, bit + 3, bit + 2, bit + 1, bit);
+        __m256i crc_vector = _mm256_set_epi32 (bit + 7, bit + 6, bit + 5, bit + 4,
+                                               bit + 3, bit + 2, bit + 1, bit);
 
         for (size_t cnt = 0; cnt < 8; cnt++)
         {
@@ -120,7 +123,7 @@ uint32_t IntrinsicHashCrc32 (const char* word, size_t len)
         crc = crc_array[(crc ^ (uint32_t) word[i]) & 0xFF] ^ (crc >> 8);
 
 
-    return (crc ^ 0xFFFFFFFFUL) % HASH_T_SIZE;
+    return crc ^ 0xFFFFFFFFUL;
 }
 
 static inline uint32_t Ror (uint32_t num, int shift)

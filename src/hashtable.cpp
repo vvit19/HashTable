@@ -20,7 +20,7 @@ bool FindWord (HashTable* hash_t, const char* word, size_t len)
     assert (hash_t);
     assert (word);
 
-    uint32_t hash_value = hash_t->hash_function (word, len);
+    uint32_t hash_value = hash_t->hash_function (word, len) % hash_t->size;
     List* cur_list = &hash_t->content[hash_value];
 
     return (bool) CheckRepeat (cur_list, word);
@@ -68,7 +68,8 @@ void InsertValue (HashTable* hash_t, const char* word, size_t len)
     assert (hash_t);
     assert (word);
 
-    uint32_t hash_value = hash_t->hash_function (word, len);
+    uint32_t hash_value = hash_t->hash_function (word, len) % hash_t->size;
+
     List* cur_list = &hash_t->content[hash_value];
     if (CheckRepeat (cur_list, word)) return;
 
@@ -101,7 +102,7 @@ void DeleteValue (HashTable* hash_t, const char* word, size_t len)
     assert (hash_t);
     assert (word);
 
-    uint32_t hash_value = hash_t->hash_function (word, len);
+    uint32_t hash_value = hash_t->hash_function (word, len) % hash_t->size;
     List* cur_list = &hash_t->content[hash_value];
 
     int position = CheckRepeat (cur_list, word);

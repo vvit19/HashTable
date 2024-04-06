@@ -2,6 +2,7 @@
 #define HASHTABLE_H
 
 // #define HASH_FUNCTIONS_CMP
+#include <cstddef>
 #define NDEBUG
 
 #include "list.h"
@@ -38,8 +39,10 @@ uint32_t HashAsciiSum          (const char* word, size_t len);
 uint32_t HashAsciiSumDivStrlen (const char* word, size_t len);
 uint32_t HashRor               (const char* word, size_t len);
 uint32_t HashRol               (const char* word, size_t len);
-uint32_t HashCRC32             (const char* word, size_t len);
-uint32_t IntrinsicHashCrc32    (const char* word, size_t len);
+
+extern "C" uint32_t AsmHashCrc32 (const char* word, size_t len);
+uint32_t HashCrc32               (const char* word, size_t len);
+uint32_t IntrinsicHashCrc32      (const char* word, size_t len);
 
 void DumpTableTxt        (HashTable* hash_t, const char* dump_filename);
 void DumpHashCsv         (HashTable* hash_t, const char* dump_filename);

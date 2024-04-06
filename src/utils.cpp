@@ -71,3 +71,33 @@ bool IsInt (double n)
 {
     return IsEqual (n, round (n));
 }
+
+int mystrcmp (const char* str1, const char* str2)
+{
+    assert (str1);
+    assert (str2);
+
+    int res = 0;
+
+    asm(".intel_syntax noprefix\n\t"
+
+        "vmovdqu ymm1, [%1]\n\t"
+        "vmovdqu ymm2, [%2]\n\t"
+        "vpcmpeqb ymm3, ymm1, ymm2\n\t"
+        "vpmovmskb eax, ymm3\n\t"
+        "cmp eax, 0xffffffff\n\t"
+        "jne .not_equal\n\t"
+        "xor rax, rax\n\t"
+        "jmp .EndLabel\n\t"
+        ".not_equal:\n\t"
+        "mov rax, 1\n\t"
+        ".EndLabel:\n\t"
+
+        ".att_syntax\n"
+        : "=r" (res)
+        : "r" (str1), "r" (str2)
+        : "ymm1", "ymm2", "ymm3"
+    );
+
+    return res;
+}

@@ -1,4 +1,5 @@
 #include "hashtable.h"
+#include "utils.h"
 
 int main ()
 {
@@ -7,7 +8,7 @@ int main ()
         uint32_t (*hash_functions[]) (const char*, size_t) =
         {
             HashZero, HashFirstLetter, HashStrlen, HashAsciiSum,
-            HashAsciiSumDivStrlen, HashRor, HashRol, HashCRC32
+            HashAsciiSumDivStrlen, HashRor, HashRol, HashCrc32
         };
 
         const char* csv_files[] =
@@ -28,7 +29,7 @@ int main ()
 
     #else
 
-        HashTable* hash_t = HashTableCtor(HASH_T_SIZE, HashCRC32);
+        HashTable* hash_t = HashTableCtor(HASH_T_SIZE, AsmHashCrc32);
         FillHashTable (hash_t, CONTENT_FILE);
 
         size_t finded_words = RunUnitTests (hash_t, UNIT_TESTS_FILE);
