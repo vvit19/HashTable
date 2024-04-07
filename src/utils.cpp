@@ -71,29 +71,3 @@ bool IsInt (double n)
 {
     return IsEqual (n, round (n));
 }
-
-int MyStrcmp (const char str1[WORD_LEN], const char str2[WORD_LEN])
-{
-    assert (str1);
-    assert (str2);
-
-    int res = 0;
-
-    asm(".intel_syntax noprefix\n\t"
-        "xor rax, rax\n\t"
-        "vmovdqu ymm1, [%1]\n\t"
-        "vpcmpeqb ymm2, ymm1, [%2]\n\t"
-        "vpmovmskb ebx, ymm2\n\t"
-        "cmp ebx, 0xffffffff\n\t"
-        "je .EndLabel\n\t"
-        "inc rax\n\t"
-
-        ".EndLabel:\n\t"
-        ".att_syntax\n"
-        : "=r" (res)
-        : "r" (str1), "r" (str2)
-        : "ymm1", "ymm2", "ebx"
-    );
-
-    return res;
-}

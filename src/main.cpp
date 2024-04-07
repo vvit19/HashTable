@@ -28,7 +28,7 @@ int main ()
 
     #else
 
-        HashTable* hash_t = HashTableCtor(HASH_T_SIZE, AsmHashCrc32);
+        HashTable* hash_t = HashTableCtor (HASH_T_SIZE, IntrinsicHashCrc32);
         FillHashTable (hash_t, CONTENT_FILE);
 
         size_t finded_words = RunUnitTests (hash_t, UNIT_TESTS_FILE);

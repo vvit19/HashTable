@@ -37,6 +37,5 @@ bool   IsEqual        (double a, double b);
 int    SkipSpaces     (char* buffer, int i);
 int    Factorial      (int n);
 bool   IsInt          (double n);
-int   MyStrcmp        (const char str1[WORD_LEN], const char str2[WORD_LEN]);
 
 #endif

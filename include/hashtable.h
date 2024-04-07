@@ -23,12 +23,20 @@ struct HashTable
     size_t size;
 };
 
+struct String
+{
+    char* string;
+    size_t len;
+};
+
 HashTable* HashTableCtor (size_t hash_t_size, uint32_t (*hash_function) (const char*, size_t));
 void       FillHashTable (HashTable* hash_t, const char* filename);
 void       InsertValue   (HashTable* hash_t, const char* word, size_t len);
 void       DeleteValue   (HashTable* hash_t, const char* word, size_t len);
 bool       FindWord      (HashTable* hash_t, const char* word, size_t len);
 void       HashTableDtor (HashTable* hash_t);
+
+extern "C" uint32_t AsmStrcmp  (const char* str1, const char* str2);
 
 uint32_t HashZero              (const char* word, size_t len);
 uint32_t HashFirstLetter       (const char* word, size_t len);
@@ -38,9 +46,8 @@ uint32_t HashAsciiSumDivStrlen (const char* word, size_t len);
 uint32_t HashRor               (const char* word, size_t len);
 uint32_t HashRol               (const char* word, size_t len);
 
-extern "C" uint32_t AsmHashCrc32 (const char* word, size_t len);
-uint32_t HashCrc32               (const char* word, size_t len);
 uint32_t IntrinsicHashCrc32      (const char* word, size_t len);
+uint32_t HashCrc32               (const char* word, size_t len);
 
 void DumpTableTxt        (HashTable* hash_t, const char* dump_filename);
 void DumpHashCsv         (HashTable* hash_t, const char* dump_filename);
