@@ -1,5 +1,4 @@
 #include "hashtable.h"
-#include "utils.h"
 
 int main ()
 {

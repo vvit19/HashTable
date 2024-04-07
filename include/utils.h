@@ -12,6 +12,8 @@
 #define RED_COLOR   "\033[91m"
 #define RESET_COLOR "\x1b[0m"
 
+const size_t      WORD_LEN            = 32;
+
 enum ExitCodes
 {
     NO_ERR,
@@ -35,6 +37,6 @@ bool   IsEqual        (double a, double b);
 int    SkipSpaces     (char* buffer, int i);
 int    Factorial      (int n);
 bool   IsInt          (double n);
-int    mystrcmp       (const char* str1, const char* str2);
+int   MyStrcmp        (const char str1[WORD_LEN], const char str2[WORD_LEN]);
 
 #endif

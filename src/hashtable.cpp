@@ -51,7 +51,7 @@ void FillHashTable (HashTable* hash_t, const char* filename)
     char* buffer = GetFileContent (filename);
     char* buffer_ptr = buffer;
 
-    char word[MAX_WORD_LEN] = "";
+    char word[WORD_LEN] = "";
     size_t len = 0;
     while (*buffer != '\0' && sscanf (buffer, "%s", word) != 0)
     {
@@ -73,7 +73,7 @@ void InsertValue (HashTable* hash_t, const char* word, size_t len)
     List* cur_list = &hash_t->content[hash_value];
     if (CheckRepeat (cur_list, word)) return;
 
-    char* word_ptr = (char*) calloc (1, len + 1);
+    char* word_ptr = (char*) calloc (1, WORD_LEN);
     strncpy (word_ptr, word, len);
 
     InsertTail (cur_list, word_ptr);
@@ -90,7 +90,7 @@ static int CheckRepeat (List* list, const char* word)
     while (cur_node_index != 0)
     {
         Node cur_node = nodes_array[cur_node_index];
-        if (strcmp (word, cur_node.value) == 0) return cur_node_index;
+        if (MyStrcmp (word, cur_node.value) == 0) return cur_node_index;
         cur_node_index = cur_node.next;
     }
 
