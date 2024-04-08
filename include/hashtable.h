@@ -23,12 +23,6 @@ struct HashTable
     size_t size;
 };
 
-struct String
-{
-    char* string;
-    size_t len;
-};
-
 HashTable* HashTableCtor (size_t hash_t_size, uint32_t (*hash_function) (const char*, size_t));
 void       FillHashTable (HashTable* hash_t, const char* filename);
 void       InsertValue   (HashTable* hash_t, const char* word, size_t len);

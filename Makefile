@@ -23,3 +23,6 @@ $(OBJ_FOLDER)mystrcmp.o : $(SRC_FOLDER)mystrcmp.s
 
 clean:
 	@rm $(TARGET) $(OBJ_FOLDER)*.o
+
+profiler:
+	valgrind --tool=callgrind ./$(TARGET)

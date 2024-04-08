@@ -91,9 +91,9 @@ static int CheckRepeat (List* list, const char* word)
     while (cur_node_index != 0)
     {
         Node cur_node = nodes_array[cur_node_index];
-        if (InlineAsmStrcmp (word, cur_node.value) == -1) return cur_node_index;
+        // if (InlineAsmStrcmp (word, cur_node.value) == -1) return cur_node_index;
         // if (AsmStrcmp (word, cur_node.value) == -1) return cur_node_index;
-        // if (strcmp (word, cur_node.value) == 0) return cur_node_index;
+        if (strcmp (word, cur_node.value) == 0) return cur_node_index;
         cur_node_index = cur_node.next;
     }
 
@@ -124,75 +124,7 @@ static inline int InlineAsmStrcmp (const char str1[WORD_LEN], const char str2[WO
          "vpcmpeqb ymm0, ymm1, YMMWORD PTR [%2]\n"
          "vpmovmskb %0, ymm0\n"
          ".att_syntax prefix\n"
-         : "=&r" (res) : "r" (str1), "r" (str2) : "ymm0", "ymm1", "cc");
+         : "=r" (res) : "r" (str1), "r" (str2) : "ymm0", "ymm1", "cc");
 
     return res;     // returns -1 if equal
-}
-
-// --------------------------------------------------------
-//                      Unit Tests
-//---------------------------------------------------------
-
-static String* ParseBuffer (char* buffer, size_t nlines);
-
-size_t RunUnitTests (HashTable* hash_t, const char* filename)
-{
-    assert (hash_t);
-    assert (filename);
-
-    char* buffer = GetFileContent (filename);
-    size_t words_num = CalcNlines (buffer);
-    String* text  = ParseBuffer (buffer, words_num);
-
-    size_t finded_words = 0;
-    for (size_t i = 0; i < words_num; i++)
-    {
-        char* word = text[i].string;
-        size_t len = text[i].len;
-
-        for (size_t k = 0; k < TESTS_NUM; k++)
-            FindWord (hash_t, word, len);
-
-        if (FindWord (hash_t, word, len))
-            ++finded_words;
-    }
-
-    free (buffer);
-    for (size_t i = 0; i < words_num; i++)
-    {
-        free (text[i].string);
-        text[i].string = nullptr;
-    }
-
-    free (text);
-    text = nullptr;
-
-    return finded_words;
-    return 0;
-}
-
-static String* ParseBuffer (char* buffer, size_t nlines)
-{
-    assert (buffer);
-
-    String* text = (String*) calloc (nlines, sizeof (String));
-
-    char word[WORD_LEN] = "";
-    size_t i = 0;
-    size_t len = 0;
-    while (*buffer != '\0' && sscanf (buffer, "%s", word) != 0)
-    {
-        len = strlen (word);
-
-        char* str = (char*) calloc (1, WORD_LEN);
-        strncpy (str, word, len);
-
-        text[i].string = str;
-        text[i].len = len;
-
-        buffer += len + 1;
-        ++i;
-    }
-
-    return text;
 }
