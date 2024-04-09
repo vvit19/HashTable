@@ -1,12 +1,5 @@
 #include "hashtable.h"
 #include "utils.h"
-#include <cstddef>
-
-struct String
-{
-    char* string;
-    size_t len;
-};
 
 size_t RunUnitTests (HashTable* hash_t, const char* filename)
 {
@@ -31,10 +24,7 @@ size_t RunUnitTests (HashTable* hash_t, const char* filename)
         word += WORD_LEN;
     }
 
-    free (text->buffer);
-    free (text->words_len);
-    free (text);
-    text = nullptr;
+    TextFree (text);
 
     return finded_words;
 }

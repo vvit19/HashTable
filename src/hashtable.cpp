@@ -85,8 +85,6 @@ static int CheckRepeat (List* list, const char* word)
         Node cur_node = nodes_array[cur_node_index];
 
         if (InlineAsmStrcmp (word, cur_node.value) == -1) return cur_node_index;
-        // if (AsmStrcmp (word, cur_node.value) == -1) return cur_node_index;
-        // if (strcmp (word, cur_node.value) == 0) return cur_node_index;
         cur_node_index = cur_node.next;
     }
 
@@ -107,9 +105,6 @@ void DeleteValue (HashTable* hash_t, const char* word, size_t len)
 
 static inline int InlineAsmStrcmp (const char str1[WORD_LEN], const char str2[WORD_LEN])
 {
-    assert (str1);
-    assert (str2);
-
     int res = 0;
 
     asm (".intel_syntax noprefix\n"
@@ -119,5 +114,5 @@ static inline int InlineAsmStrcmp (const char str1[WORD_LEN], const char str2[WO
          ".att_syntax prefix\n"
          : "=r" (res) : "r" (str1), "r" (str2) : "ymm0", "ymm1", "cc");
 
-    return res;     // returns -1 if equal
+    return res;
 }

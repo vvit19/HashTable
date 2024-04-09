@@ -13,7 +13,7 @@
 const char* const CONTENT_FILE        = "hamlet.txt";
 const char* const TXT_DUMP_FILE       = "dump.txt";
 const char* const UNIT_TESTS_FILE     = "unittests.txt";
-const size_t      TESTS_NUM           = 100;
+const size_t      TESTS_NUM           = 10000;
 const uint32_t    HASH_T_SIZE         = 2003;
 
 struct HashTable
