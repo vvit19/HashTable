@@ -1,4 +1,6 @@
 #include "hashtable.h"
+#include "utils.h"
+#include <cstddef>
 
 struct String
 {
@@ -6,66 +8,33 @@ struct String
     size_t len;
 };
 
-static String* ParseBuffer (char* buffer, size_t nlines);
-
 size_t RunUnitTests (HashTable* hash_t, const char* filename)
 {
     assert (hash_t);
     assert (filename);
 
-    char* buffer = GetFileContent (filename);
-    size_t words_num = CalcNlines (buffer);
-    String* text  = ParseBuffer (buffer, words_num);
+    Text* text = GetAlignedFileContent(filename);
+    size_t words_num = text->nlines;
 
     size_t finded_words = 0;
+    char* word = text->buffer;
     for (size_t i = 0; i < words_num; i++)
     {
-        char* word = text[i].string;
-        size_t len = text[i].len;
+        size_t len = text->words_len[i];
 
         for (size_t k = 0; k < TESTS_NUM; k++)
             FindWord (hash_t, word, len);
 
         if (FindWord (hash_t, word, len))
             ++finded_words;
+
+        word += WORD_LEN;
     }
 
-    free (buffer);
-    for (size_t i = 0; i < words_num; i++)
-    {
-        free (text[i].string);
-        text[i].string = nullptr;
-    }
-
+    free (text->buffer);
+    free (text->words_len);
     free (text);
     text = nullptr;
 
     return finded_words;
-    return 0;
-}
-
-static String* ParseBuffer (char* buffer, size_t nlines)
-{
-    assert (buffer);
-
-    String* text = (String*) calloc (nlines, sizeof (String));
-
-    char word[WORD_LEN] = "";
-    size_t i = 0;
-    size_t len = 0;
-    while (*buffer != '\0' && sscanf (buffer, "%s", word) != 0)
-    {
-        len = strlen (word);
-
-        char* str = (char*) calloc (1, WORD_LEN);
-        strncpy (str, word, len);
-
-        text[i].string = str;
-        text[i].len = len;
-
-        buffer += len + 1;
-        ++i;
-    }
-
-    return text;
 }

@@ -7,8 +7,12 @@
 static ListErrors VerifyFullList (List* list);
 static void RecFreeNodes (List* list, int cur_index);
 
-#define FULL_LIST_VERIFY(list) \
-    if ((VerifyFullList (list)) == LIST_IS_FULL) return LIST_IS_FULL;
+#ifndef NDEBUG
+    #define FULL_LIST_VERIFY(list) \
+        if ((VerifyFullList (list)) == LIST_IS_FULL) return LIST_IS_FULL;
+#else
+    #define FULFULL_LIST_VERIFY(list)
+#endif
 
 void ListCtor (List* list, int capacity)
 {
@@ -263,11 +267,7 @@ void ListDtor (List* list)
 {
     assert (list);
 
-    RecFreeNodes (list, list->head);
-    free ((void*) list->nodes[0].value);
-
-    free (list->nodes);
-    list->nodes = nullptr;
+    FREE (list->nodes);
 
     list->capacity = list->free = list->head = list->size = list->tail = -1;
     list->linear = false;
@@ -280,15 +280,4 @@ static ListErrors VerifyFullList (List* list)
     if (list->free == 0) ListResize (list, list->capacity * 2);
 
     return NO_LIST_ERROR;
-}
-
-static void RecFreeNodes (List* list, int cur_index)
-{
-    int next = list->nodes[cur_index].next;
-    const char* value = list->nodes[cur_index].value;
-
-    if (next) RecFreeNodes (list, next);
-
-    free ((void*) value);
-    list->nodes[cur_index].value = nullptr;
 }

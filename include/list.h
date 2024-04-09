@@ -1,6 +1,8 @@
 #ifndef LIST_H
 #define LIST_H
 
+#include "utils.h"
+
 const int MIN_CAPACITY   =  50;
 const int FICT_ELEM      =  0;
 const int PREV_FOR_FREE  = -1;

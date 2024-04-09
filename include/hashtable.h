@@ -24,7 +24,7 @@ struct HashTable
 };
 
 HashTable* HashTableCtor (size_t hash_t_size, uint32_t (*hash_function) (const char*, size_t));
-void       FillHashTable (HashTable* hash_t, const char* filename);
+void       FillHashTable (HashTable* hash_t, Text* text);
 void       InsertValue   (HashTable* hash_t, const char* word, size_t len);
 void       DeleteValue   (HashTable* hash_t, const char* word, size_t len);
 bool       FindWord      (HashTable* hash_t, const char* word, size_t len);

@@ -1,4 +1,5 @@
 #include "hashtable.h"
+#include "utils.h"
 
 int main ()
 {
@@ -29,11 +30,15 @@ int main ()
     #else
 
         HashTable* hash_t = HashTableCtor (HASH_T_SIZE, IntrinsicHashCrc32);
-        FillHashTable (hash_t, CONTENT_FILE);
+
+        Text* text = GetAlignedFileContent(CONTENT_FILE);
+
+        FillHashTable (hash_t, text);
 
         size_t finded_words = RunUnitTests (hash_t, UNIT_TESTS_FILE);
         printf ("FINDED_WORDS = %lu \n", finded_words);
 
+        TextFree (text);
         HashTableDtor (hash_t);
 
     #endif

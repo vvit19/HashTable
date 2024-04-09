@@ -1,4 +1,6 @@
 #include "hashtable.h"
+#include "utils.h"
+#include <cstddef>
 
 static int        CheckRepeat     (List* list, const char* word);
 static inline int IntrinsicStrcmp (const char str1[WORD_LEN], const char str2[WORD_LEN]);
@@ -34,34 +36,27 @@ void HashTableDtor (HashTable* hash_t)
     for (size_t i = 0; i < hash_t->size; i++)
         ListDtor (&hash_t->content[i]);
 
-    free (hash_t->content);
-    hash_t->content = nullptr;
+    FREE (hash_t->content);
 
     hash_t->hash_function = nullptr;
     hash_t->size = 0;
 
-    free (hash_t);
-    hash_t = nullptr;
+    FREE (hash_t);
 }
 
-void FillHashTable (HashTable* hash_t, const char* filename)
+void FillHashTable (HashTable* hash_t, Text* text)
 {
     assert (hash_t);
     assert (filename);
 
-    char* buffer = GetFileContent (filename);
-    char* buffer_ptr = buffer;
+    size_t words_num = text->nlines;
+    char* buffer = text->buffer;
 
-    char word[WORD_LEN] = "";
-    size_t len = 0;
-    while (*buffer != '\0' && sscanf (buffer, "%s", word) != 0)
+    for (size_t i = 0; i < words_num; ++i)
     {
-        len = strlen (word);
-        InsertValue (hash_t, word, len);
-        buffer += len + 1;
+        InsertValue (hash_t, buffer, text->words_len[i]);
+        buffer += WORD_LEN;
     }
-
-    free (buffer_ptr);
 }
 
 void InsertValue (HashTable* hash_t, const char* word, size_t len)
@@ -74,10 +69,7 @@ void InsertValue (HashTable* hash_t, const char* word, size_t len)
     List* cur_list = &hash_t->content[hash_value];
     if (CheckRepeat (cur_list, word)) return;
 
-    char* word_ptr = (char*) calloc (1, WORD_LEN);
-    strncpy (word_ptr, word, len);
-
-    InsertTail (cur_list, word_ptr);
+    InsertTail (cur_list, word);
 }
 
 static int CheckRepeat (List* list, const char* word)
@@ -91,9 +83,10 @@ static int CheckRepeat (List* list, const char* word)
     while (cur_node_index != 0)
     {
         Node cur_node = nodes_array[cur_node_index];
-        // if (InlineAsmStrcmp (word, cur_node.value) == -1) return cur_node_index;
+
+        if (InlineAsmStrcmp (word, cur_node.value) == -1) return cur_node_index;
         // if (AsmStrcmp (word, cur_node.value) == -1) return cur_node_index;
-        if (strcmp (word, cur_node.value) == 0) return cur_node_index;
+        // if (strcmp (word, cur_node.value) == 0) return cur_node_index;
         cur_node_index = cur_node.next;
     }
 
@@ -120,7 +113,7 @@ static inline int InlineAsmStrcmp (const char str1[WORD_LEN], const char str2[WO
     int res = 0;
 
     asm (".intel_syntax noprefix\n"
-         "vmovdqu ymm1, YMMWORD PTR [%1]\n"
+         "vmovdqa ymm1, YMMWORD PTR [%1]\n"
          "vpcmpeqb ymm0, ymm1, YMMWORD PTR [%2]\n"
          "vpmovmskb %0, ymm0\n"
          ".att_syntax prefix\n"

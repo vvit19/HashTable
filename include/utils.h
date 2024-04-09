@@ -12,7 +12,18 @@
 #define RED_COLOR   "\033[91m"
 #define RESET_COLOR "\x1b[0m"
 
+#define FREE(ptr) \
+    free (ptr); \
+    ptr = nullptr;
+
 const size_t      WORD_LEN            = 32;
+
+struct Text
+{
+    char* buffer;
+    size_t* words_len;
+    size_t nlines;
+};
 
 enum ExitCodes
 {
@@ -37,5 +48,7 @@ bool   IsEqual        (double a, double b);
 int    SkipSpaces     (char* buffer, int i);
 int    Factorial      (int n);
 bool   IsInt          (double n);
+Text*  GetAlignedFileContent (const char* filename);
+void   TextFree              (Text* text);
 
 #endif
