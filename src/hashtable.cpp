@@ -3,7 +3,6 @@
 #include <cstddef>
 
 static int        CheckRepeat     (List* list, const char* word);
-static inline int IntrinsicStrcmp (const char str1[WORD_LEN], const char str2[WORD_LEN]);
 static inline int InlineAsmStrcmp (const char str1[WORD_LEN], const char str2[WORD_LEN]);
 
 HashTable* HashTableCtor (size_t hash_t_size, uint32_t (*hash_function) (const char*, size_t))
@@ -105,6 +104,9 @@ void DeleteValue (HashTable* hash_t, const char* word, size_t len)
 
 static inline int InlineAsmStrcmp (const char str1[WORD_LEN], const char str2[WORD_LEN])
 {
+    assert (str1);
+    assert (str2);
+
     int res = 0;
 
     asm (".intel_syntax noprefix\n"
