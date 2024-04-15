@@ -186,6 +186,12 @@ uint32_t HashCrc32(const char* word, size_t len)
 
 Самыми затратными по времени фукнциями, которые вызывает функция поиска, являются ```HashCrc32``` (36 %) и ```strcmp``` (30 %). Их я и буду оптимизировать.
 
+Примечание: функция ```FindWord``` состоит только из присваиваний, цикла и прочих накладных расходов, что и обеспечивает такое время работы. Поэтому я считаю ее оптимизацию ненужной (ускорение будет очень низким, при этом ухудшится читаемость кода, и функция ```CheckRepeat``` может перестать быть ```inline```, если писать ее в отдельном ассемблерном файле).
+
+Отчет о работе ```FindWord```:
+
+<img src= "https://github.com/vvit19/HashTable/blob/master/profilerdata/findword0.png" width="500px"/>
+
 ### HashCrc32 optimization
 
 Вообще говоря, хеш-функция ```CRC32``` была подобрана неслучайно. Дело в том, что существует ассемблерная функция, которая считает этот хеш. Можно использовать AVX инструкции:
@@ -281,3 +287,11 @@ static inline int InlineAsmStrcmp (const char str1[WORD_LEN], const char str2[WO
 Благодаря профилировщику можно искать узкие места в программе, которые можно оптимизировать. Таким образом, точечными низкоуровневыми оптимизациями программа была ускорена в 1,79 раз. Это показывает, что использование только компиляторных оптимизаций недостаточно.
 
 Бонус: DED_coeff = $\frac{\text{ускорение программы}}{количество  ассемблерных  строк} * 1000 = \frac{1790}{12} = 141,17$
+
+## Список литературы и ресурсов
+
+- Randal Bryant, David O'Hallaron - Computer Systems: A Programmer's Perspective 3rd Edition
+- Valgrind - https://valgrind.org/
+- Compiler Explorer - https://godbolt.org/
+- Mirror of Intel® Intrinsics Guide - https://www.laruence.com/sse
+- Wikipedia: [HashTable](https://en.wikipedia.org/wiki/Hash_table), [Crc32](https://ru.wikipedia.org/wiki/%D0%A6%D0%B8%D0%BA%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9_%D0%B8%D0%B7%D0%B1%D1%8B%D1%82%D0%BE%D1%87%D0%BD%D1%8B%D0%B9_%D0%BA%D0%BE%D0%B4)
