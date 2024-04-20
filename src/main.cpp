@@ -29,9 +29,9 @@ int main ()
 
     #else
 
-        HashTable* hash_t = HashTableCtor (HASH_T_SIZE, IntrinsicHashCrc32);
+        HashTable* hash_t = HashTableCtor (HASH_T_SIZE, nullptr);
 
-        Text* text = GetAlignedFileContent(CONTENT_FILE);
+        Text* text = GetAlignedFileContent (CONTENT_FILE);
 
         FillHashTable (hash_t, text);
 

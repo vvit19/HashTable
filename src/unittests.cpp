@@ -1,5 +1,4 @@
 #include "hashtable.h"
-#include "utils.h"
 
 size_t RunUnitTests (HashTable* hash_t, const char* filename)
 {
@@ -16,9 +15,9 @@ size_t RunUnitTests (HashTable* hash_t, const char* filename)
         size_t len = text->words_len[i];
 
         for (size_t k = 0; k < TESTS_NUM; k++)
-            FindWord (hash_t, word, len);
+            SearchElemHT (hash_t, word, len);
 
-        if (FindWord (hash_t, word, len))
+        if (SearchElemHT (hash_t, word, len))
             ++finded_words;
 
         word += WORD_LEN;

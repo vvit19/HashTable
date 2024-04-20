@@ -27,10 +27,13 @@ HashTable* HashTableCtor (size_t hash_t_size, uint32_t (*hash_function) (const c
 void       FillHashTable (HashTable* hash_t, Text* text);
 void       InsertValue   (HashTable* hash_t, const char* word, size_t len);
 void       DeleteValue   (HashTable* hash_t, const char* word, size_t len);
-bool       FindWord      (HashTable* hash_t, const char* word, size_t len);
+bool       SearchElemHT  (HashTable* hash_t, const char* word, size_t len);
 void       HashTableDtor (HashTable* hash_t);
+int        CheckRepeat   (List* list, const char* word);
 
 extern "C" uint32_t AsmStrcmp  (const char* str1, const char* str2);
+
+extern "C" uint32_t AsmHashCrc32 (const char* word, size_t len);
 
 uint32_t HashZero              (const char* word, size_t len);
 uint32_t HashFirstLetter       (const char* word, size_t len);
@@ -39,9 +42,27 @@ uint32_t HashAsciiSum          (const char* word, size_t len);
 uint32_t HashAsciiSumDivStrlen (const char* word, size_t len);
 uint32_t HashRor               (const char* word, size_t len);
 uint32_t HashRol               (const char* word, size_t len);
+uint32_t HashCrc32             (const char* word, size_t len);
 
-uint32_t IntrinsicHashCrc32      (const char* word, size_t len);
-uint32_t HashCrc32               (const char* word, size_t len);
+inline uint32_t IntrinsicHashCrc32 (const char* word, size_t len);
+inline uint32_t IntrinsicHashCrc32 (const char* word, size_t len)
+{
+	uint32_t hash = 0xEDB88320;
+
+	for (size_t i = 0; i < len; i++)
+		hash = _mm_crc32_u8 (hash, word[i]);
+
+	return hash;
+}
+
+inline uint32_t HashFunction (HashTable* hash_t, const char* word, size_t len)
+{
+    #ifdef HASH_FUNCTIONS_CMP
+        return hash_t->hash_function (word, len);
+    #else
+        return IntrinsicHashCrc32 (word, len);
+    #endif
+}
 
 void DumpTableTxt        (HashTable* hash_t, const char* dump_filename);
 void DumpHashCsv         (HashTable* hash_t, const char* dump_filename);

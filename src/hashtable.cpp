@@ -1,8 +1,6 @@
 #include "hashtable.h"
 #include "utils.h"
-#include <cstddef>
 
-static int        CheckRepeat     (List* list, const char* word);
 static inline int InlineAsmStrcmp (const char str1[WORD_LEN], const char str2[WORD_LEN]);
 
 HashTable* HashTableCtor (size_t hash_t_size, uint32_t (*hash_function) (const char*, size_t))
@@ -18,14 +16,33 @@ HashTable* HashTableCtor (size_t hash_t_size, uint32_t (*hash_function) (const c
     return hash_t;
 }
 
-bool FindWord (HashTable* hash_t, const char* word, size_t len)
+bool SearchElemHT (HashTable* hash_t, const char* word, size_t len)
 {
     assert (hash_t);
     assert (word);
 
-    uint32_t hash_value = hash_t->hash_function (word, len) % hash_t->size;
+    uint32_t hash_value = HashFunction (hash_t, word, len) % hash_t->size;
 
     return (bool) CheckRepeat (&hash_t->content[hash_value], word);
+}
+
+int CheckRepeat (List* list, const char* word)
+{
+    assert (list);
+    assert (word);
+
+    Node* nodes_array = list->nodes;
+    int cur_node_index = list->head;
+
+    while (cur_node_index != 0)
+    {
+        Node cur_node = nodes_array[cur_node_index];
+
+        if (InlineAsmStrcmp (word, cur_node.value) == -1) return cur_node_index;
+        cur_node_index = cur_node.next;
+    }
+
+    return 0;
 }
 
 void HashTableDtor (HashTable* hash_t)
@@ -63,7 +80,7 @@ void InsertValue (HashTable* hash_t, const char* word, size_t len)
     assert (hash_t);
     assert (word);
 
-    uint32_t hash_value = hash_t->hash_function (word, len) % hash_t->size;
+    uint32_t hash_value = HashFunction (hash_t, word, len) % hash_t->size;
 
     List* cur_list = &hash_t->content[hash_value];
     if (CheckRepeat (cur_list, word)) return;
@@ -71,31 +88,13 @@ void InsertValue (HashTable* hash_t, const char* word, size_t len)
     InsertTail (cur_list, word);
 }
 
-static int CheckRepeat (List* list, const char* word)
-{
-    assert (list);
-    assert (word);
-
-    Node* nodes_array = list->nodes;
-    int cur_node_index = list->head;
-
-    while (cur_node_index != 0)
-    {
-        Node cur_node = nodes_array[cur_node_index];
-
-        if (InlineAsmStrcmp (word, cur_node.value) == -1) return cur_node_index;
-        cur_node_index = cur_node.next;
-    }
-
-    return 0;
-}
 
 void DeleteValue (HashTable* hash_t, const char* word, size_t len)
 {
     assert (hash_t);
     assert (word);
 
-    uint32_t hash_value = hash_t->hash_function (word, len) % hash_t->size;
+    uint32_t hash_value = HashFunction (hash_t, word, len) % hash_t->size;
     List* cur_list = &hash_t->content[hash_value];
 
     int position = CheckRepeat (cur_list, word);
