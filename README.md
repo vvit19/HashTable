@@ -282,7 +282,7 @@ inline uint32_t IntrinsicHashCrc32 (const char* word, size_t len)
 | Оптимизации | Время <br> CPU cycles   | Абсолютное ускорение | Относительное ускорение |
 | :---------: | :------: | :----------: | :------------: |
 | Baseline    | 3 015 051 475 | 1 | 1 |
-| Assembky Hash | 2 549 774 952 | 1,18 | 1,18 |
+| Assembly Hash | 2 549 774 952 | 1,18 | 1,18 |
 | Inline asm strcmp | 1 654 515 435 | 1,82 | 1,54 |
 | Intrinsic Hash | 1 392 389 225 | 2,17 | 1,19 |
 
