@@ -161,7 +161,7 @@ uint32_t HashCrc32(const char* word, size_t len)
 - **CPU**: Intel(R) Core(TM) i7-10510U CPU @ 1.80GHz
 - **Compiler**: gcc 11.4.0
 - **Compiler flags**: -g -O3 -mavx2
-- **CPU temperature**: 40 °C
+- **CPU temperature**: 40 $\pm$ 3 °C
 
 Тестирование заключалось в поиске в хеш-таблице слов из текста. Для расчета времени исполнения функции поиска использован профилировщик ```callgrind```.
 
